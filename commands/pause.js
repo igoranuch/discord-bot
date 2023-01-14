@@ -7,7 +7,7 @@ export default {
     const queue = client.player.getQueue(interaction.guild);
 
     if (!queue) {
-      await interaction.reply("There is no song playing");
+      await interaction.reply("There is no video playing");
       return;
     }
 

@@ -5,24 +5,24 @@ import { EmbedBuilder } from "discord.js";
 export default {
   data: new SlashCommandBuilder()
     .setName("play")
-    .setDescription("Plays a song")
+    .setDescription("Plays a video")
     .addSubcommand((subcommand) =>
       subcommand
         .setName("search")
-        .setDescription("Searches for a song")
+        .setDescription("Searches for a video")
         .addStringOption((option) => option.setName("searchterms").setDescription("search keywords").setRequired(true))
     )
+    // .addSubcommand((subcommand) =>
+    //   subcommand
+    //     .setName("playlist")
+    //     .setDescription("Plays a playlist from YT")
+    //     .addStringOption((option) => option.setName("url").setDescription("url of playlist").setRequired(true))
+    // )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("playlist")
-        .setDescription("Plays a playlist from YT")
-        .addStringOption((option) => option.setName("url").setDescription("url of playlist").setRequired(true))
-    )
-    .addSubcommand((subcommand) =>
-      subcommand
-        .setName("song")
-        .setDescription("Plays a song from YT")
-        .addStringOption((option) => option.setName("url").setDescription("url of song").setRequired(true))
+        .setName("video")
+        .setDescription("Plays a video from YT")
+        .addStringOption((option) => option.setName("url").setDescription("url of video").setRequired(true))
     ),
   async execute({ client, interaction }) {
     if (!interaction.member.voice.channel) {
@@ -35,7 +35,7 @@ export default {
 
     let embed = new EmbedBuilder();
 
-    if (interaction.options.getSubcommand() === "song") {
+    if (interaction.options.getSubcommand() === "video") {
       let url = interaction.options.getString("url");
 
       const result = await client.player.search(url, {
@@ -44,57 +44,63 @@ export default {
       });
 
       if (!result.tracks.length) {
-        await interaction.reply("no results found");
+        await interaction.reply("No results found");
       }
 
-      const song = result.tracks[0];
+      const video = result.tracks[0];
 
-      await queue.addTrack(song);
-
-      embed
-        .setDescription(`Added **[${song.title}](${song.url})** to the queue.`)
-        .setThumbnail(song.thumbnail)
-        .setFooter({ text: `Duration: ${song.duration}` });
-    } else if (interaction.options.getSubcommand() === "playlist") {
-      let url = interaction.options.getString("url");
-
-      const result = await client.player.search(url, {
-        requestedBy: interaction.user,
-        searchEngine: QueryType.YOUTUBE_PLAYLIST,
-      });
-
-      if (!result.tracks.length) {
-        await interaction.reply("no results found");
-      }
-
-      const playlist = result.playlist;
-
-      await queue.addTracks(playlist);
+      await queue.addTrack(video);
 
       embed
-        .setDescription(`Added **[${playlist.title}](${playlist.url})** to the queue.`)
-        .setThumbnail(playlist.thumbnail)
-        .setFooter({ text: `Duration: ${playlist.duration}` });
-    } else if (interaction.options.getSubcommand() === "search") {
-      let url = interaction.options.getString("searchTerms");
+        .setDescription(`Added **[${video.title}](${video.url})** to the queue.`)
+        .setThumbnail(video.thumbnail)
+        .setFooter({ text: `Duration: ${video.duration}` });
+    }
+    // else if (interaction.options.getSubcommand() === "playlist") {
+    //   let url = interaction.options.getString("url");
 
-      const result = await client.player.search(url, {
+    //   const result = await client.player.search(url, {
+    //     requestedBy: interaction.user,
+    //     searchEngine: QueryType.YOUTUBE_PLAYLIST,
+    //   });
+
+    //   if (!result.playlist) {
+    //     await interaction.reply("No results found");
+    //   }
+
+    //   console.log(result);
+
+    //   const playlist = result.playlist;
+
+    //   console.log(playlist);
+
+    //   await queue.addTracks(playlist);
+
+    //   embed
+    //     .setDescription(`Added **[${playlist.title}](${playlist.url})** to the queue.`)
+    //     .setThumbnail(playlist.thumbnail)
+    //     .setFooter({ text: `Duration: ${playlist.duration}` });
+    // }
+    else if (interaction.options.getSubcommand() === "search") {
+      let searchTerms = interaction.options.getString("searchterms");
+
+      const result = await client.player.search(searchTerms, {
         requestedBy: interaction.user,
         searchEngine: QueryType.AUTO,
       });
 
       if (!result.tracks.length) {
-        await interaction.reply("no results found");
+        await interaction.reply("No results found");
       }
 
-      const song = result.tracks[0];
+      const video = result.tracks[0];
 
-      await queue.addTrack(song);
+      await queue.addTrack(video);
 
       embed
-        .setDescription(`Added **[${song}]** to the queue.`)
-        .setThumbnail(song.thumbnail)
-        .setFooter({ text: `Duration: ${song.duration}` });
+        .setDescription(`Added **[${video.title}](${video.url})** to the queue.`)
+        .setThumbnail(video.thumbnail)
+        .setFooter({ text: `Duration: ${video.duration}` });
     }
 
     if (!queue.playing) await queue.play();

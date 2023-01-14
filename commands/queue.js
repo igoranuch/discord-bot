@@ -22,7 +22,7 @@ export default {
       embeds: [
         new EmbedBuilder()
           .setDescription(
-            `Currently Playing: ** \n\ ${currentSong.title} - <@${currentSong.requestedBy.id}>\n\nQueue:**\n${queueString}`
+            `Currently Playing: ** \n\ ${currentSong.title} - <@${currentSong.requestedBy.id}>\n\n Queue:**\n${queueString}`
           )
           .setThumbnail(currentSong.thumbnail),
       ],
