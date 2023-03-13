@@ -42,7 +42,7 @@ client.player = new Player(client, {
 client.on("ready", () => {
   const guildIds = client.guilds.cache.map((guild) => guild.id);
 
-  const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
+  const rest = new REST({ version: "14" }).setToken(process.env.TOKEN);
 
   guildIds.forEach((guildId) => {
     rest
